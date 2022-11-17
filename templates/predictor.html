@@ -24,25 +24,81 @@
         }
         h2{
             color: sandybrown;
-            margin-top: 90px;
+            margin-top: 130px;
             font-family: cursive;
             text-align: left;
             padding-left: 170px;
+
         }
 
      </style>
 </head>
 <body>
 {#onmouseenter="myFunction()" #}
-<h2>HIT SONG PREDICTOR</h2>
-<form id="form">
+<nav class="navbar navbar-dark bg-dark fixed-top">
+  <div class="container-fluid">
+    <a style="color: sandybrown" class="navbar-brand" href="/">Vibe Checker</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+      <span class="navbar-toggler-icon"></span>
+      </button>
+    <div style="background-color: black" class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasNavbarLabel" style="background-color: black; color:sandybrown ">MENU</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body" style="background-color: black;color:sandybrown">
+        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+
+{#          <li class="nav-item dropdown"style="background-color: black;color:sandybrown">#}
+{#            <a class="nav-link dropdown-toggle" href="#" id="offcanvasNavbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">#}
+{#              houses#}
+{#            </a>#}
+{#            <ul class="dropdown-menu" aria-labelledby="offcanvasNavbarDropdown">#}
+{#               <li class="nav-item">#}
+{#            <a class="nav-link" href="/flop" style="color:sandybrown">flop </a>#}
+{#          </li>#}
+{#           <li class="nav-item">#}
+{#            <a class="nav-link" href="/hit" style="color:sandybrown">hit </a>#}
+{#          </li>#}
+{#           <li class="nav-item">#}
+{#            <a class="nav-link" href="/hitmaker" style="color:sandybrown">hitmaker </a>#}
+{#          </li>#}
+{#           <li class="nav-item">#}
+{#            <a class="nav-link" href="/possibly" style="color:sandybrown">possibly </a>#}
+{#          </li>#}
+{##}
+{#            </ul>#}
+
+          </li>
+
+          </li>
+          <li><a href="/"style="background-color: black;color:sandybrown;text-decoration: none" >Home</a></li>
+            <li><a href="/table"style="background-color: black;color:sandybrown;text-decoration: none" >Songs</a></li>
+          <li><a href="/feedback"style="background-color: black;color:sandybrown;text-decoration: none" >Feedback</a></li>
+
+{#          <li class="nav-item">#}
+{#              <button><a class="nav-link" href="/logout" >sign out</a></button>#}
+{#              <div class="d-flex justify-content-end">#}
+{#                <button class="btn btn-dark me-md-2" type="button">#}
+{#                    <a class="nav-link" href="/logout" style="color:#d9e71b;float: bottom" >sign out</a>#}
+{#                </button>#}
+{#              </div>#}
+{#          </li>#}
+
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+<h2>VIBE CHECKER</h2>
+<form id="form" method="post">
     <div class="form-floating">
-  <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea" placeholder="nter the song URL" id="url"></textarea>
+  <textarea name="url" class="form-control" placeholder="Leave a comment here" id="floatingTextarea" placeholder="Enter the song URL" id="url"></textarea>
   <label for="floatingTextarea">Enter the song URL</label>
 
 </div  >
     <div class="col-12">
-    <button class="btn btn-primary" type="submit" style="margin-top: 30px; align-content: center;background-color: black">Check</button>
+    <button name="check" class="btn btn-primary" type="submit"  style="margin-top: 30px; align-content: center;color: sandybrown;background-color: black"id="checkButton">Check</button>
 </div>
 </form>
 

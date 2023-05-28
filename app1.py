@@ -1,4 +1,7 @@
+import csv
 import os
+
+import pandas as pd
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_bcrypt import generate_password_hash, check_password_hash
 # from database import Users, House
@@ -48,10 +51,10 @@ with engine.connect() as conn:
     result1 = conn.execute(text("SELECT album FROM Track_data1"))
 
 # print the result
-for row in result:
-    print(row.track_id)
-for row in result1:
-    print(row.album)
+# for row in result:
+#     print(row.track_id)
+# for row in result1:
+#     print(row.album)
 
 # engine = create_engine('sqlite:////tmp/test.db')
 metadata = MetaData(bind=engine)
@@ -251,9 +254,14 @@ def flop():
 
 @app.route('/table', methods=["POST", "GET"])
 def table():
+    # data = pandas.read_csv(r'C:/Users/user/PycharmProjects/HitSongPredictor/Kenya.csv')
+    # Read the CSV file using pandas
+    data = pd.read_csv('Kenya.csv')
 
+    # Convert the CSV data to a list of dictionaries
+    csv_data = data.to_dict('records')
 
-    return render_template("table.html")
+    return render_template("table.html", query=csv_data)
 
 @app.route('/feedback', methods=["POST", "GET"])
 def feedback():

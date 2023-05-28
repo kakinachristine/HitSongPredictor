@@ -30,12 +30,12 @@ engine = create_engine("sqlite+pysqlite:///:memory:")
 
 # Read data from CSV which will be
 # loaded as a dataframe object
-data = pandas.read_csv(r'C:\Users\user\PycharmProjects\hitMusicPredictor\Kenya.csv')
-data1 = pandas.read_csv(r'C:\Users\user\PycharmProjects\hitMusicPredictor\Naija.csv')
+data = pandas.read_csv(r'C:/Users/user/PycharmProjects/HitSongPredictor/Kenya.csv')
+data1 = pandas.read_csv(r'C:/Users/user/PycharmProjects/HitSongPredictor/Naija.csv')
 
 # print the sample of a dataframe
-print(data.head())
-print(data1.head())
+# print(data.head())
+# print(data1.head())
 
 # Write data into the table in sqllite database
 data.to_sql('Track_data', engine)
@@ -133,8 +133,8 @@ def url():
 
         # Read data from CSV which will be
         # loaded as a dataframe object
-        data_kenya = pandas.read_csv(r'C:\Users\user\PycharmProjects\hitMusicPredictor\Kenya.csv')
-        data_naija = pandas.read_csv(r'C:\Users\user\PycharmProjects\hitMusicPredictor\Naija.csv')
+        data_kenya = pandas.read_csv(r'C:/Users/user/PycharmProjects/HitSongPredictor/Kenya.csv')
+        data_naija = pandas.read_csv(r'C:/Users/user/PycharmProjects/HitSongPredictor/Naija.csv')
 
         # print the sample of a dataframe
         # print(data.head())
@@ -176,59 +176,90 @@ def url():
             result6 = engine1.execute(
                 'select speechiness from Track_data where track_id =="1QgM3SejXDyHkqt0guA4TX"').first()
             # result7 = engine.execute('select speechiness from Track_data where speechiness >= 0.5').first()
-            print("The liveness is", result4)
-            print("The energy is", result3)
-            print("The danceability is", result5)
-            print("The speechiness is", result6)
+            # print("The liveness is", result4)
+            # print("The energy is", result3)
+            # print("The danceability is", result5)
+            # print("The speechiness is", result6)
             # /////////////////////////////
             # with engine1.connect() as CONN:
+
+            # Query the database for the track attributes
             dancing = engine1.execute(
-                    'select track_id =="1QgM3SejXDyHkqt0guA4TX" from Track_data where danceability >= 0.5').first()
-
+                f"SELECT danceability FROM Track_data WHERE track_id = '{run}'").first()
             live = engine1.execute(
-                    'select track_id =="1QgM3SejXDyHkqt0guA4TX"  from Track_data where liveness >= 0.4').first()
+                f"SELECT liveness FROM Track_data WHERE track_id = '{run}'").first()
             energyopor = engine1.execute(
-                    'select track_id =="1QgM3SejXDyHkqt0guA4TX"  from Track_data where energy >= 0.4').first()
+                f"SELECT energy FROM Track_data WHERE track_id = '{run}'").first()
             speech = engine1.execute(
-                    'select track_id =="1QgM3SejXDyHkqt0guA4TX"  from Track_data where speechiness >= 0.4').first()
-            # result11 = engine.execute(
-            # 'SELECT @runs := run FROM Track_data WHERE track_id == runs  AND speechiness >0.4').first()
+                f"SELECT speechiness FROM Track_data WHERE track_id = '{run}'").first()
+            print("The liveness is", dancing)
+            print("The energy is", live)
+            print("The danceability is", energyopor)
+            print("The speechiness is", speech)
 
-            # print the result
-            print(dancing)
-            print(live)
-            print(energyopor)
-            print(speech)
-            # variables = ["result7", "result3", "result5", "result6"]
-            for danceability in dancing:
-                if danceability == 1:
-                    print("danceability is good")
-                else:
-                    print("danceability is bad")
-            for liveness in live:
-                if liveness == 1:
-                    print("liveness is good")
-                else:
-                    print("liveness is bad")
-            for energy in energyopor:
-                if energy == 1:
-                    print("energy is good")
-                else:
-                    print("energy is bad")
-            for speechiness in speech:
-                if speechiness == 1:
-                    print("speechiness is good")
-                else:
-                    print("speechiness is bad")
-            total = danceability + liveness + energy + speechiness
+            speechiness = 0
+            for s in speech:
+                if s >= 0.4:
+                    speechiness = 1
+
+            danceability = 0
+            for d in dancing:
+                if d >= 0.5:
+                    danceability = 1
+
+            liveliness = 0
+            for l in live:
+                if l >= 0.3:
+                    liveliness = 1
+
+            energy = 0
+            for e in energyopor:
+                if e >= 0.3:
+                    energy = 1
+
+            total =  energy + liveliness + danceability + speechiness
+
+
+
+
+            # Determine the result based on the total conditions
             if total == 2:
                 print("possibly")
+                return redirect(url_for('possibly'))
             elif total > 2:
                 print("hit")
+                return redirect(url_for('hit'))
             else:
                 print("flop")
+                return redirect(url_for('flop'))
 
     return render_template("predictor.html")
+
+@app.route('/hit')
+def hit():
+
+    return render_template("hit.html")
+@app.route('/possibly')
+def possibly():
+
+    return render_template("possibly.html")
+@app.route('/flop')
+def flop():
+
+    return render_template("flop.html")
+
+
+@app.route('/table', methods=["POST", "GET"])
+def table():
+
+
+    return render_template("table.html")
+
+@app.route('/feedback', methods=["POST", "GET"])
+def feedback():
+
+
+    return render_template("feedback.html")
 
 
 if __name__ == '__main__':
@@ -237,3 +268,6 @@ if __name__ == '__main__':
     # sess = Session()
     app.debug = True
     app.run()
+
+
+

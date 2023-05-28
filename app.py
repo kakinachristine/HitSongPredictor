@@ -29,8 +29,8 @@ engine = create_engine("sqlite+pysqlite:///:memory:")
 
 # Read data from CSV which will be
 # loaded as a dataframe object
-data = pandas.read_csv(r'C:\Users\user\PycharmProjects\hitMusicPredictor\Kenya.csv')
-data1 = pandas.read_csv(r'C:\Users\user\PycharmProjects\hitMusicPredictor\Naija.csv')
+data = pandas.read_csv(r'C:/Users/user/PycharmProjects/HitSongPredictor/Kenya.csv')
+data1 = pandas.read_csv(r'C:/Users/user/PycharmProjects/HitSongPredictor/Naija.csv')
 
 # print the sample of a dataframe
 print(data.head())
@@ -141,8 +141,8 @@ def url(DECLARE=None):
 
         # Read data from CSV which will be
         # loaded as a dataframe object
-        data = pandas.read_csv(r'C:\Users\user\PycharmProjects\hitMusicPredictor\Kenya.csv')
-        data1 = pandas.read_csv(r'C:\Users\user\PycharmProjects\hitMusicPredictor\Naija.csv')
+        data = pandas.read_csv(r'C:/Users/user/PycharmProjects/HitSongPredictor/Kenya.csv')
+        data1 = pandas.read_csv(r'C:/Users/user/PycharmProjects/HitSongPredictor/Naija.csv')
 
         # print the sample of a dataframe
         # print(data.head())
@@ -187,10 +187,10 @@ def url(DECLARE=None):
             print("The speechiness is", result6)
         # /////////////////////////////
 
-            result8 = engine.execute('select track_id =="2EISZ7FY6AkSP8ObzenBcB" from Track_data where danceability >= 0.5').first()
-            result7 = engine.execute('select track_id =="2EISZ7FY6AkSP8ObzenBcB"  from Track_data where liveness >= 0.4').first()
-            result9 = engine.execute('select track_id =="2EISZ7FY6AkSP8ObzenBcB"  from Track_data where energy >= 0.4').first()
-            result10 = engine.execute('select track_id =="2EISZ7FY6AkSP8ObzenBcB"  from Track_data where speechiness >= 0.4').first()
+            result8 = engine.execute('select track_id ==run from Track_data where danceability >= 0.5').first()
+            result7 = engine.execute('select track_id ==run  from Track_data where liveness >= 0.4').first()
+            result9 = engine.execute('select track_id ==run  from Track_data where energy >= 0.4').first()
+            result10 = engine.execute('select track_id ==run  from Track_data where speechiness >= 0.4').first()
             # result11 = engine.execute('SELECT @runs := run FROM Track_data WHERE track_id == runs  AND speechiness >0.4').first()
 
 
@@ -223,13 +223,28 @@ def url(DECLARE=None):
         sum = danceability + liveness + energy + speechiness
         if sum==2:
             print("possibly")
+            return redirect(url_for('possibly'))
         elif sum>2:
             print("hit")
+            return redirect(url_for('hit'))
         else:
             print("flop")
+            return redirect(url_for('flop'))
 
 
     return render_template("predictor.html")
+
+@app.route('/table', methods=["POST", "GET"])
+def table():
+
+
+    return render_template("table.html")
+
+@app.route('/feedback', methods=["POST", "GET"])
+def feedback():
+
+
+    return render_template("feedback.html")
 
 
 if __name__ == '__main__':

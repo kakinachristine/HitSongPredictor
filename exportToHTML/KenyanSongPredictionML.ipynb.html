@@ -1,0 +1,310 @@
+<html>
+<head>
+<title>KenyanSongPredictionML.ipynb</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #bcbec4;}
+.s1 { color: #cf8e6d;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+.s4 { color: #7a7e85;}
+.s5 { color: #2aacb8;}
+.s6 { color: #5f826b; font-style: italic;}
+.ls0 { height: 1px; border-width: 0; color: #43454a; background-color:#43454a}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+KenyanSongPredictionML.ipynb</font>
+</center></td></tr></table>
+<pre><span class="s0">#%% md 
+# KENYA TOP 100 PREDICTION <hr class="ls0">#%% 
+</span><span class="s1">import </span><span class="s0">pandas </span><span class="s1">as </span><span class="s0">pd</span>
+<span class="s1">import </span><span class="s0">numpy </span><span class="s1">as </span><span class="s0">np</span>
+<span class="s1">import </span><span class="s0">matplotlib</span><span class="s2">.</span><span class="s0">pyplot </span><span class="s1">as </span><span class="s0">plt</span>
+<span class="s1">import </span><span class="s0">seaborn </span><span class="s1">as </span><span class="s0">sns</span>
+
+<span class="s0">data </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">read_csv</span><span class="s2">(</span><span class="s3">r'C:\Users\ChristineKakina\PycharmProjects\HitSongPredictor\Kenya.csv'</span><span class="s2">)</span>
+<span class="s0">df </span><span class="s2">= </span><span class="s0">data</span><span class="s2">.</span><span class="s0">copy</span><span class="s2">()</span>
+<hr class="ls0"><span class="s0">#%% 
+df</span><span class="s2">.</span><span class="s0">head</span><span class="s2">()</span><hr class="ls0"><span class="s0">#%% 
+df</span><span class="s2">.</span><span class="s0">info</span><span class="s2">()</span><hr class="ls0"><span class="s0">#%% 
+df</span><span class="s2">.</span><span class="s0">describe</span><span class="s2">()</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s4"># Select numeric columns</span>
+<span class="s0">numeric_cols </span><span class="s2">= </span><span class="s0">df</span><span class="s2">.</span><span class="s0">select_dtypes</span><span class="s2">(</span><span class="s0">include</span><span class="s2">=</span><span class="s3">'number'</span><span class="s2">).</span><span class="s0">columns</span><span class="s2">.</span><span class="s0">tolist</span><span class="s2">()</span>
+
+<span class="s4"># Drop columns that make little or no difference to a song</span>
+<span class="s0">drop_cols </span><span class="s2">= [</span><span class="s3">'duration_ms'</span><span class="s2">, </span><span class="s3">'tempo'</span><span class="s2">, </span><span class="s3">'key'</span><span class="s2">, </span><span class="s3">'time_signature'</span><span class="s2">,</span><span class="s3">'loudness'</span><span class="s2">,</span><span class="s3">'mode'</span><span class="s2">]</span>
+<span class="s0">relevant_features </span><span class="s2">= [</span><span class="s0">col </span><span class="s1">for </span><span class="s0">col </span><span class="s1">in </span><span class="s0">numeric_cols </span><span class="s1">if </span><span class="s0">col </span><span class="s1">not in </span><span class="s0">drop_cols</span><span class="s2">]</span>
+
+<span class="s0">df</span><span class="s2">[</span><span class="s0">relevant_features</span><span class="s2">].</span><span class="s0">info</span><span class="s2">()</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s4"># Mean value of the remaining columns</span>
+<span class="s0">feature_means </span><span class="s2">= </span><span class="s0">df</span><span class="s2">[</span><span class="s0">relevant_features</span><span class="s2">].</span><span class="s0">mean</span><span class="s2">().</span><span class="s0">sort_values</span><span class="s2">(</span><span class="s0">ascending</span><span class="s2">=</span><span class="s1">False</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s0">feature_means</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">import </span><span class="s0">matplotlib</span><span class="s2">.</span><span class="s0">pyplot </span><span class="s1">as </span><span class="s0">plt</span>
+
+<span class="s4"># Example: feature_means is a Pandas Series</span>
+<span class="s0">feature_means</span><span class="s2">.</span><span class="s0">plot</span><span class="s2">(</span>
+    <span class="s0">kind</span><span class="s2">=</span><span class="s3">'bar'</span><span class="s2">,</span>
+    <span class="s0">figsize</span><span class="s2">=(</span><span class="s5">12</span><span class="s2">,</span><span class="s5">5</span><span class="s2">),</span>
+    <span class="s0">color</span><span class="s2">=</span><span class="s0">plt</span><span class="s2">.</span><span class="s0">cm</span><span class="s2">.</span><span class="s0">viridis_r</span><span class="s2">(</span><span class="s0">np</span><span class="s2">.</span><span class="s0">linspace</span><span class="s2">(</span><span class="s5">0.2</span><span class="s2">, </span><span class="s5">0.8</span><span class="s2">, </span><span class="s0">len</span><span class="s2">(</span><span class="s0">feature_means</span><span class="s2">)))  </span><span class="s4"># colorful gradient</span>
+<span class="s2">)</span>
+
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">title</span><span class="s2">(</span><span class="s3">'Average Value of Each Feature'</span><span class="s2">, </span><span class="s0">fontsize</span><span class="s2">=</span><span class="s5">14</span><span class="s2">, </span><span class="s0">fontweight</span><span class="s2">=</span><span class="s3">'bold'</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">ylabel</span><span class="s2">(</span><span class="s3">'Mean Value'</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">xlabel</span><span class="s2">(</span><span class="s3">'Features'</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">xticks</span><span class="s2">(</span><span class="s0">rotation</span><span class="s2">=</span><span class="s5">45</span><span class="s2">, </span><span class="s0">ha</span><span class="s2">=</span><span class="s3">'right'</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">grid</span><span class="s2">(</span><span class="s0">axis</span><span class="s2">=</span><span class="s3">'y'</span><span class="s2">, </span><span class="s0">linestyle</span><span class="s2">=</span><span class="s3">'--'</span><span class="s2">, </span><span class="s0">alpha</span><span class="s2">=</span><span class="s5">0.7</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">tight_layout</span><span class="s2">()</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">show</span><span class="s2">()</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s4"># Picking the five attributes  as intrumentalness makes a minor diff</span>
+<span class="s0">song_features </span><span class="s2">= </span><span class="s0">feature_means</span><span class="s2">.</span><span class="s0">head</span><span class="s2">(</span><span class="s5">5</span><span class="s2">).</span><span class="s0">index</span><span class="s2">.</span><span class="s0">tolist</span><span class="s2">()</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s0">song_features</span><span class="s2">)</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s4">#using  these features create a hit score by getting the average of the normalized features</span>
+<span class="s0">features </span><span class="s2">= [</span><span class="s3">'liveness'</span><span class="s2">, </span><span class="s3">'speechiness'</span><span class="s2">, </span><span class="s3">'danceability'</span><span class="s2">, </span><span class="s3">'energy'</span><span class="s2">,</span><span class="s3">'valence'</span><span class="s2">]</span>
+
+<span class="s0">df</span><span class="s2">[</span><span class="s3">'hit_score'</span><span class="s2">] = </span><span class="s0">df</span><span class="s2">[</span><span class="s0">features</span><span class="s2">].</span><span class="s0">mean</span><span class="s2">(</span><span class="s0">axis</span><span class="s2">=</span><span class="s5">1</span><span class="s2">)</span>
+
+<span class="s4"># # Define a threshold using median</span>
+<span class="s4"># threshold = df['hit_score'].median()</span>
+<span class="s4"># df['hit_status'] = (df['hit_score'] &gt;= threshold).astype(int)  # 1 = banger, 0 = flop</span>
+
+<span class="s0">df</span><span class="s2">[[</span><span class="s3">'track_name'</span><span class="s2">, </span><span class="s3">'hit_score'</span><span class="s2">]].</span><span class="s0">head</span><span class="s2">()</span>
+<span class="s0">df</span><span class="s2">[[</span><span class="s3">'track_name'</span><span class="s2">, </span><span class="s3">'hit_score'</span><span class="s2">]]</span><hr class="ls0"><span class="s0">#%% 
+</span><hr class="ls0"><span class="s0">#%% md 
+## MATHEMATICAL MODELLING USING LINEAR ALGEBRA 
+ <hr class="ls0">#%% 
+</span><span class="s4">#USING GAUSSIAN ELIMINATION METHOD:</span>
+
+<span class="s0">features </span><span class="s2">= [</span><span class="s3">'liveness'</span><span class="s2">, </span><span class="s3">'speechiness'</span><span class="s2">, </span><span class="s3">'danceability'</span><span class="s2">, </span><span class="s3">'energy'</span><span class="s2">, </span><span class="s3">'valence'</span><span class="s2">]  </span><span class="s4"># 5 features</span>
+<span class="s0">N </span><span class="s2">= </span><span class="s0">len</span><span class="s2">(</span><span class="s0">features</span><span class="s2">)</span>
+
+<span class="s4"># Gaussian elimination with partial pivoting ---</span>
+<span class="s1">def </span><span class="s0">gaussian_elimination_solve</span><span class="s2">(</span><span class="s0">A_in</span><span class="s2">, </span><span class="s0">b_in</span><span class="s2">, </span><span class="s0">eps</span><span class="s2">=</span><span class="s5">1e-12</span><span class="s2">):</span>
+    <span class="s6">&quot;&quot;&quot; 
+    Solve Ax = b using Gaussian elimination with partial pivoting. 
+    A_in: (n,n) numpy array 
+    b_in: (n,) or (n,1) numpy array 
+    Returns x (n,) 
+    Raises ValueError if matrix is singular (within tolerance). 
+    &quot;&quot;&quot;</span>
+    <span class="s0">A </span><span class="s2">= </span><span class="s0">A_in</span><span class="s2">.</span><span class="s0">astype</span><span class="s2">(</span><span class="s0">float</span><span class="s2">).</span><span class="s0">copy</span><span class="s2">()</span>
+    <span class="s0">b </span><span class="s2">= </span><span class="s0">b_in</span><span class="s2">.</span><span class="s0">astype</span><span class="s2">(</span><span class="s0">float</span><span class="s2">).</span><span class="s0">copy</span><span class="s2">().</span><span class="s0">reshape</span><span class="s2">(-</span><span class="s5">1</span><span class="s2">, </span><span class="s5">1</span><span class="s2">)</span>
+    <span class="s0">n </span><span class="s2">= </span><span class="s0">A</span><span class="s2">.</span><span class="s0">shape</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]</span>
+
+    <span class="s4"># Forward elimination</span>
+    <span class="s1">for </span><span class="s0">k </span><span class="s1">in </span><span class="s0">range</span><span class="s2">(</span><span class="s0">n</span><span class="s2">):</span>
+        <span class="s4"># Partial pivoting: find pivot row</span>
+        <span class="s0">pivot_row </span><span class="s2">= </span><span class="s0">np</span><span class="s2">.</span><span class="s0">argmax</span><span class="s2">(</span><span class="s0">np</span><span class="s2">.</span><span class="s0">abs</span><span class="s2">(</span><span class="s0">A</span><span class="s2">[</span><span class="s0">k</span><span class="s2">:</span><span class="s0">n</span><span class="s2">, </span><span class="s0">k</span><span class="s2">])) + </span><span class="s0">k</span>
+        <span class="s1">if </span><span class="s0">abs</span><span class="s2">(</span><span class="s0">A</span><span class="s2">[</span><span class="s0">pivot_row</span><span class="s2">, </span><span class="s0">k</span><span class="s2">]) &lt; </span><span class="s0">eps</span><span class="s2">:</span>
+            <span class="s1">raise </span><span class="s0">ValueError</span><span class="s2">(</span><span class="s3">&quot;Matrix is singular or nearly singular (pivot ~ 0).&quot;</span><span class="s2">)</span>
+        <span class="s4"># Swap if needed</span>
+        <span class="s1">if </span><span class="s0">pivot_row </span><span class="s2">!= </span><span class="s0">k</span><span class="s2">:</span>
+            <span class="s0">A</span><span class="s2">[[</span><span class="s0">k</span><span class="s2">, </span><span class="s0">pivot_row</span><span class="s2">]] = </span><span class="s0">A</span><span class="s2">[[</span><span class="s0">pivot_row</span><span class="s2">, </span><span class="s0">k</span><span class="s2">]]</span>
+            <span class="s0">b</span><span class="s2">[[</span><span class="s0">k</span><span class="s2">, </span><span class="s0">pivot_row</span><span class="s2">]] = </span><span class="s0">b</span><span class="s2">[[</span><span class="s0">pivot_row</span><span class="s2">, </span><span class="s0">k</span><span class="s2">]]</span>
+
+        <span class="s4"># Eliminate below</span>
+        <span class="s1">for </span><span class="s0">i </span><span class="s1">in </span><span class="s0">range</span><span class="s2">(</span><span class="s0">k</span><span class="s2">+</span><span class="s5">1</span><span class="s2">, </span><span class="s0">n</span><span class="s2">):</span>
+            <span class="s0">factor </span><span class="s2">= </span><span class="s0">A</span><span class="s2">[</span><span class="s0">i</span><span class="s2">, </span><span class="s0">k</span><span class="s2">] / </span><span class="s0">A</span><span class="s2">[</span><span class="s0">k</span><span class="s2">, </span><span class="s0">k</span><span class="s2">]</span>
+            <span class="s0">A</span><span class="s2">[</span><span class="s0">i</span><span class="s2">, </span><span class="s0">k</span><span class="s2">:</span><span class="s0">n</span><span class="s2">] = </span><span class="s0">A</span><span class="s2">[</span><span class="s0">i</span><span class="s2">, </span><span class="s0">k</span><span class="s2">:</span><span class="s0">n</span><span class="s2">] - </span><span class="s0">factor </span><span class="s2">* </span><span class="s0">A</span><span class="s2">[</span><span class="s0">k</span><span class="s2">, </span><span class="s0">k</span><span class="s2">:</span><span class="s0">n</span><span class="s2">]</span>
+            <span class="s0">b</span><span class="s2">[</span><span class="s0">i</span><span class="s2">, </span><span class="s5">0</span><span class="s2">] = </span><span class="s0">b</span><span class="s2">[</span><span class="s0">i</span><span class="s2">, </span><span class="s5">0</span><span class="s2">] - </span><span class="s0">factor </span><span class="s2">* </span><span class="s0">b</span><span class="s2">[</span><span class="s0">k</span><span class="s2">, </span><span class="s5">0</span><span class="s2">]</span>
+
+    <span class="s4"># Back substitution</span>
+    <span class="s0">x </span><span class="s2">= </span><span class="s0">np</span><span class="s2">.</span><span class="s0">zeros</span><span class="s2">((</span><span class="s0">n</span><span class="s2">, </span><span class="s5">1</span><span class="s2">), </span><span class="s0">dtype</span><span class="s2">=</span><span class="s0">float</span><span class="s2">)</span>
+    <span class="s1">for </span><span class="s0">i </span><span class="s1">in </span><span class="s0">range</span><span class="s2">(</span><span class="s0">n</span><span class="s2">-</span><span class="s5">1</span><span class="s2">, -</span><span class="s5">1</span><span class="s2">, -</span><span class="s5">1</span><span class="s2">):</span>
+        <span class="s1">if </span><span class="s0">abs</span><span class="s2">(</span><span class="s0">A</span><span class="s2">[</span><span class="s0">i</span><span class="s2">, </span><span class="s0">i</span><span class="s2">]) &lt; </span><span class="s0">eps</span><span class="s2">:</span>
+            <span class="s1">raise </span><span class="s0">ValueError</span><span class="s2">(</span><span class="s3">&quot;Matrix is singular or nearly singular during back substitution.&quot;</span><span class="s2">)</span>
+        <span class="s0">x</span><span class="s2">[</span><span class="s0">i</span><span class="s2">, </span><span class="s5">0</span><span class="s2">] = (</span><span class="s0">b</span><span class="s2">[</span><span class="s0">i</span><span class="s2">, </span><span class="s5">0</span><span class="s2">] - </span><span class="s0">np</span><span class="s2">.</span><span class="s0">dot</span><span class="s2">(</span><span class="s0">A</span><span class="s2">[</span><span class="s0">i</span><span class="s2">, </span><span class="s0">i</span><span class="s2">+</span><span class="s5">1</span><span class="s2">:</span><span class="s0">n</span><span class="s2">], </span><span class="s0">x</span><span class="s2">[</span><span class="s0">i</span><span class="s2">+</span><span class="s5">1</span><span class="s2">:</span><span class="s0">n</span><span class="s2">, </span><span class="s5">0</span><span class="s2">])) / </span><span class="s0">A</span><span class="s2">[</span><span class="s0">i</span><span class="s2">, </span><span class="s0">i</span><span class="s2">]</span>
+
+    <span class="s1">return </span><span class="s0">x</span><span class="s2">.</span><span class="s0">flatten</span><span class="s2">()</span>
+
+<span class="s4"># --- Select top-N songs by hit_score to build a square system ---</span>
+<span class="s1">if </span><span class="s0">df</span><span class="s2">.</span><span class="s0">shape</span><span class="s2">[</span><span class="s5">0</span><span class="s2">] &lt; </span><span class="s0">N</span><span class="s2">:</span>
+    <span class="s1">raise </span><span class="s0">RuntimeError</span><span class="s2">(</span><span class="s3">f&quot;Not enough rows (</span><span class="s1">{</span><span class="s0">df</span><span class="s2">.</span><span class="s0">shape</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]</span><span class="s1">}</span><span class="s3">) to form a </span><span class="s1">{</span><span class="s0">N</span><span class="s1">}</span><span class="s3">x</span><span class="s1">{</span><span class="s0">N</span><span class="s1">} </span><span class="s3">system.&quot;</span><span class="s2">)</span>
+
+<span class="s0">topN </span><span class="s2">= </span><span class="s0">df</span><span class="s2">.</span><span class="s0">sort_values</span><span class="s2">(</span><span class="s3">'hit_score'</span><span class="s2">, </span><span class="s0">ascending</span><span class="s2">=</span><span class="s1">False</span><span class="s2">).</span><span class="s0">head</span><span class="s2">(</span><span class="s0">N</span><span class="s2">)</span>
+<span class="s0">A </span><span class="s2">= </span><span class="s0">topN</span><span class="s2">[</span><span class="s0">features</span><span class="s2">].</span><span class="s0">values</span>
+<span class="s0">b </span><span class="s2">= </span><span class="s0">topN</span><span class="s2">[</span><span class="s3">'hit_score'</span><span class="s2">].</span><span class="s0">values</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;Top-N track names used for the square system:&quot;</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s0">topN</span><span class="s2">[[</span><span class="s3">'track_name'</span><span class="s2">, </span><span class="s3">'track_id'</span><span class="s2">, </span><span class="s3">'hit_score'</span><span class="s2">]])</span>
+
+<span class="s4"># --- Solve with Gaussian elimination ---</span>
+<span class="s1">try</span><span class="s2">:</span>
+    <span class="s0">coeffs_gauss </span><span class="s2">= </span><span class="s0">gaussian_elimination_solve</span><span class="s2">(</span><span class="s0">A</span><span class="s2">, </span><span class="s0">b</span><span class="s2">)</span>
+    <span class="s0">coeffs_dict </span><span class="s2">= </span><span class="s0">dict</span><span class="s2">(</span><span class="s0">zip</span><span class="s2">(</span><span class="s0">features</span><span class="s2">, </span><span class="s0">coeffs_gauss</span><span class="s2">))</span>
+    <span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;</span><span class="s1">\n</span><span class="s3">Coefficients found via Gaussian elimination (exact for these chosen rows):&quot;</span><span class="s2">)</span>
+    <span class="s1">for </span><span class="s0">f</span><span class="s2">, </span><span class="s0">c </span><span class="s1">in </span><span class="s0">coeffs_dict</span><span class="s2">.</span><span class="s0">items</span><span class="s2">():</span>
+        <span class="s0">print</span><span class="s2">(</span><span class="s3">f&quot;  </span><span class="s1">{</span><span class="s0">f</span><span class="s1">}</span><span class="s3">: </span><span class="s1">{</span><span class="s0">c</span><span class="s1">:</span><span class="s3">.6f</span><span class="s1">}</span><span class="s3">&quot;</span><span class="s2">)</span>
+
+    <span class="s4"># Verify: A @ coeffs_gauss should equal b (within numerical tolerance)</span>
+    <span class="s0">residual </span><span class="s2">= </span><span class="s0">A</span><span class="s2">.</span><span class="s0">dot</span><span class="s2">(</span><span class="s0">coeffs_gauss</span><span class="s2">) - </span><span class="s0">b</span>
+    <span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;</span><span class="s1">\n</span><span class="s3">Residuals on the chosen top-N rows (A x - b):&quot;</span><span class="s2">)</span>
+    <span class="s0">print</span><span class="s2">(</span><span class="s0">residual</span><span class="s2">)</span>
+    <span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;Max abs residual:&quot;</span><span class="s2">, </span><span class="s0">np</span><span class="s2">.</span><span class="s0">max</span><span class="s2">(</span><span class="s0">np</span><span class="s2">.</span><span class="s0">abs</span><span class="s2">(</span><span class="s0">residual</span><span class="s2">)))</span>
+
+    <span class="s4"># Apply these coefficients to entire dataset and show top-10 predicted</span>
+    <span class="s0">X_all </span><span class="s2">= </span><span class="s0">df</span><span class="s2">[</span><span class="s0">features</span><span class="s2">].</span><span class="s0">values</span>
+    <span class="s0">df</span><span class="s2">[</span><span class="s3">'predicted_hit_score_gauss'</span><span class="s2">] = </span><span class="s0">X_all</span><span class="s2">.</span><span class="s0">dot</span><span class="s2">(</span><span class="s0">coeffs_gauss</span><span class="s2">)</span>
+    <span class="s0">top10_pred </span><span class="s2">= </span><span class="s0">df</span><span class="s2">[[</span><span class="s3">'track_name'</span><span class="s2">, </span><span class="s3">'track_id'</span><span class="s2">, </span><span class="s3">'hit_score'</span><span class="s2">, </span><span class="s3">'predicted_hit_score_gauss'</span><span class="s2">]]</span><span class="s0">\</span>
+                  <span class="s2">.</span><span class="s0">sort_values</span><span class="s2">(</span><span class="s3">'predicted_hit_score_gauss'</span><span class="s2">, </span><span class="s0">ascending</span><span class="s2">=</span><span class="s1">False</span><span class="s2">).</span><span class="s0">head</span><span class="s2">(</span><span class="s5">10</span><span class="s2">)</span>
+    <span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;</span><span class="s1">\n</span><span class="s3">Top 10 by Gaussian solution predicted score:&quot;</span><span class="s2">)</span>
+    <span class="s0">print</span><span class="s2">(</span><span class="s0">top10_pred</span><span class="s2">.</span><span class="s0">to_string</span><span class="s2">(</span><span class="s0">index</span><span class="s2">=</span><span class="s1">False</span><span class="s2">))</span>
+
+<span class="s1">except </span><span class="s0">ValueError </span><span class="s1">as </span><span class="s0">e</span><span class="s2">:</span>
+    <span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;Gaussian elimination failed:&quot;</span><span class="s2">, </span><span class="s0">e</span><span class="s2">)</span>
+    <span class="s4"># fallback suggestion: maybe the chosen A is singular; try a different selection or use least-squares</span>
+    <span class="s4"># Example: try a different set of N independent rows or use np.linalg.lstsq as fallback.</span>
+    <span class="s4"># You could also try regularization (ridge) with closed form (X^T X + lambda I)^{-1} X^T y.</span>
+
+<span class="s4"># --- Optional: check condition number to see stability ---</span>
+<span class="s0">cond </span><span class="s2">= </span><span class="s0">np</span><span class="s2">.</span><span class="s0">linalg</span><span class="s2">.</span><span class="s0">cond</span><span class="s2">(</span><span class="s0">A</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">f&quot;</span><span class="s1">\n</span><span class="s3">Condition number of A (top-N): </span><span class="s1">{</span><span class="s0">cond</span><span class="s1">:</span><span class="s3">.3e</span><span class="s1">}</span><span class="s3">&quot;</span><span class="s2">)</span>
+<span class="s1">if </span><span class="s0">cond </span><span class="s2">&gt; </span><span class="s5">1e12</span><span class="s2">:</span>
+    <span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;Warning: matrix is ill-conditioned; solution may be numerically unstable.&quot;</span><span class="s2">)</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><hr class="ls0"><span class="s0">#%% md 
+# MACHINE LEARNING MODELLING <hr class="ls0">#%% 
+</span><span class="s1">import </span><span class="s0">pandas </span><span class="s1">as </span><span class="s0">pd</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">model_selection </span><span class="s1">import </span><span class="s0">train_test_split</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">linear_model </span><span class="s1">import </span><span class="s0">LinearRegression</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">ensemble </span><span class="s1">import </span><span class="s0">RandomForestRegressor</span><span class="s2">, </span><span class="s0">GradientBoostingRegressor</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">metrics </span><span class="s1">import </span><span class="s0">mean_squared_error</span><span class="s2">, </span><span class="s0">r2_score</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s4"># Features and target</span>
+<span class="s0">features </span><span class="s2">= [</span><span class="s3">'liveness'</span><span class="s2">, </span><span class="s3">'speechiness'</span><span class="s2">, </span><span class="s3">'danceability'</span><span class="s2">, </span><span class="s3">'energy'</span><span class="s2">, </span><span class="s3">'valence'</span><span class="s2">]</span>
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df</span><span class="s2">[</span><span class="s0">features</span><span class="s2">]</span>
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df</span><span class="s2">[</span><span class="s3">'hit_score'</span><span class="s2">]</span>
+
+<span class="s4"># Split data 50/50</span>
+<span class="s0">X_train</span><span class="s2">, </span><span class="s0">X_test</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">, </span><span class="s0">y_test </span><span class="s2">= </span><span class="s0">train_test_split</span><span class="s2">(</span><span class="s0">X</span><span class="s2">, </span><span class="s0">y</span><span class="s2">, </span><span class="s0">test_size</span><span class="s2">=</span><span class="s5">0.5</span><span class="s2">, </span><span class="s0">random_state</span><span class="s2">=</span><span class="s5">42</span><span class="s2">)</span>
+<hr class="ls0"><span class="s0">#%% md 
+### 1:Linear Regression <hr class="ls0">#%% 
+</span><span class="s4"># Initialize and train</span>
+<span class="s0">lr_model </span><span class="s2">= </span><span class="s0">LinearRegression</span><span class="s2">()</span>
+<span class="s0">lr_model</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">X_train</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">)</span>
+
+<span class="s4"># Predict</span>
+<span class="s0">y_pred_lr </span><span class="s2">= </span><span class="s0">lr_model</span><span class="s2">.</span><span class="s0">predict</span><span class="s2">(</span><span class="s0">X_test</span><span class="s2">)</span>
+
+<span class="s4"># Evaluate</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;Linear Regression:&quot;</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;Coefficients:&quot;</span><span class="s2">, </span><span class="s0">dict</span><span class="s2">(</span><span class="s0">zip</span><span class="s2">(</span><span class="s0">features</span><span class="s2">, </span><span class="s0">lr_model</span><span class="s2">.</span><span class="s0">coef_</span><span class="s2">)))</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;Intercept:&quot;</span><span class="s2">, </span><span class="s0">lr_model</span><span class="s2">.</span><span class="s0">intercept_</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;R2 Score:&quot;</span><span class="s2">, </span><span class="s0">r2_score</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred_lr</span><span class="s2">))</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;MSE:&quot;</span><span class="s2">, </span><span class="s0">mean_squared_error</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred_lr</span><span class="s2">))</span>
+<hr class="ls0"><span class="s0">#%% md 
+### 2:Random Forest <hr class="ls0">#%% 
+rf_model </span><span class="s2">= </span><span class="s0">RandomForestRegressor</span><span class="s2">(</span><span class="s0">n_estimators</span><span class="s2">=</span><span class="s5">100</span><span class="s2">, </span><span class="s0">random_state</span><span class="s2">=</span><span class="s5">42</span><span class="s2">)</span>
+<span class="s0">rf_model</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">X_train</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">)</span>
+<span class="s0">y_pred_rf </span><span class="s2">= </span><span class="s0">rf_model</span><span class="s2">.</span><span class="s0">predict</span><span class="s2">(</span><span class="s0">X_test</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;</span><span class="s1">\n</span><span class="s3">Random Forest:&quot;</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;R2 Score:&quot;</span><span class="s2">, </span><span class="s0">r2_score</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred_rf</span><span class="s2">))</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;MSE:&quot;</span><span class="s2">, </span><span class="s0">mean_squared_error</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred_rf</span><span class="s2">))</span><hr class="ls0"><span class="s0">#%% md 
+### 3: Gradient Boosting <hr class="ls0">#%% 
+</span><span class="s4"># Gradient Boosting</span>
+<span class="s0">gb_model </span><span class="s2">= </span><span class="s0">GradientBoostingRegressor</span><span class="s2">(</span><span class="s0">n_estimators</span><span class="s2">=</span><span class="s5">100</span><span class="s2">, </span><span class="s0">random_state</span><span class="s2">=</span><span class="s5">42</span><span class="s2">)</span>
+<span class="s0">gb_model</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">X_train</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">)</span>
+<span class="s0">y_pred_gb </span><span class="s2">= </span><span class="s0">gb_model</span><span class="s2">.</span><span class="s0">predict</span><span class="s2">(</span><span class="s0">X_test</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;</span><span class="s1">\n</span><span class="s3">Gradient Boosting:&quot;</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;R2 Score:&quot;</span><span class="s2">, </span><span class="s0">r2_score</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred_gb</span><span class="s2">))</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;MSE:&quot;</span><span class="s2">, </span><span class="s0">mean_squared_error</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred_gb</span><span class="s2">))</span><hr class="ls0"><span class="s0">#%% 
+comparison </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">DataFrame</span><span class="s2">({</span>
+    <span class="s3">'track_name'</span><span class="s2">: </span><span class="s0">df</span><span class="s2">.</span><span class="s0">loc</span><span class="s2">[</span><span class="s0">y_test</span><span class="s2">.</span><span class="s0">index</span><span class="s2">, </span><span class="s3">'track_name'</span><span class="s2">],</span>
+    <span class="s3">'actual_hit_score'</span><span class="s2">: </span><span class="s0">y_test</span><span class="s2">,</span>
+    <span class="s3">'pred_lr'</span><span class="s2">: </span><span class="s0">y_pred_lr</span><span class="s2">,</span>
+    <span class="s3">'pred_rf'</span><span class="s2">: </span><span class="s0">y_pred_rf</span><span class="s2">,</span>
+    <span class="s3">'pred_gb'</span><span class="s2">: </span><span class="s0">y_pred_gb</span>
+<span class="s2">})</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">comparison</span><span class="s2">.</span><span class="s0">sort_values</span><span class="s2">(</span><span class="s3">'actual_hit_score'</span><span class="s2">, </span><span class="s0">ascending</span><span class="s2">=</span><span class="s1">False</span><span class="s2">).</span><span class="s0">head</span><span class="s2">(</span><span class="s5">10</span><span class="s2">))</span>
+<hr class="ls0"><span class="s0">#%% md 
+## Top 10 songs using linear regression <hr class="ls0">#%% 
+</span><span class="s4"># Add predicted hit scores for test set</span>
+<span class="s0">df</span><span class="s2">.</span><span class="s0">loc</span><span class="s2">[</span><span class="s0">y_test</span><span class="s2">.</span><span class="s0">index</span><span class="s2">, </span><span class="s3">'predicted_hit_score_lr'</span><span class="s2">] = </span><span class="s0">y_pred_lr</span>
+
+<span class="s4">#Sort and display</span>
+<span class="s0">top_10_lr </span><span class="s2">= </span><span class="s0">df</span><span class="s2">.</span><span class="s0">loc</span><span class="s2">[</span><span class="s0">y_test</span><span class="s2">.</span><span class="s0">index</span><span class="s2">, [</span><span class="s3">'track_name'</span><span class="s2">, </span><span class="s3">'hit_score'</span><span class="s2">, </span><span class="s3">'predicted_hit_score_lr'</span><span class="s2">]]</span><span class="s0">\</span>
+    <span class="s2">.</span><span class="s0">sort_values</span><span class="s2">(</span><span class="s3">'predicted_hit_score_lr'</span><span class="s2">, </span><span class="s0">ascending</span><span class="s2">=</span><span class="s1">False</span><span class="s2">).</span><span class="s0">head</span><span class="s2">(</span><span class="s5">10</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">top_10_lr</span><span class="s2">)</span>
+<hr class="ls0"><span class="s0">#%% 
+plt</span><span class="s2">.</span><span class="s0">figure</span><span class="s2">(</span><span class="s0">figsize</span><span class="s2">=(</span><span class="s5">10</span><span class="s2">,</span><span class="s5">6</span><span class="s2">))</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">barh</span><span class="s2">(</span>
+    <span class="s0">top_10_lr</span><span class="s2">[</span><span class="s3">'track_name'</span><span class="s2">],</span>
+    <span class="s0">top_10_lr</span><span class="s2">[</span><span class="s3">'predicted_hit_score_lr'</span><span class="s2">],</span>
+    <span class="s0">color</span><span class="s2">=</span><span class="s0">plt</span><span class="s2">.</span><span class="s0">cm</span><span class="s2">.</span><span class="s0">viridis</span><span class="s2">(</span><span class="s0">np</span><span class="s2">.</span><span class="s0">linspace</span><span class="s2">(</span><span class="s5">0</span><span class="s2">, </span><span class="s5">1</span><span class="s2">, </span><span class="s0">len</span><span class="s2">(</span><span class="s0">top_10_lr</span><span class="s2">)))</span>
+<span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">xlabel</span><span class="s2">(</span><span class="s3">'Predicted Hit Score'</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">title</span><span class="s2">(</span><span class="s3">'Top 10 Songs Predicted by Linear Regression'</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">gca</span><span class="s2">().</span><span class="s0">invert_yaxis</span><span class="s2">()  </span><span class="s4"># highest on top</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">show</span><span class="s2">()</span>
+<hr class="ls0"><span class="s0">#%% 
+</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">figure</span><span class="s2">(</span><span class="s0">figsize</span><span class="s2">=(</span><span class="s5">10</span><span class="s2">,</span><span class="s5">6</span><span class="s2">))</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">barh</span><span class="s2">(</span><span class="s0">top_10_la</span><span class="s2">[</span><span class="s3">'track_name'</span><span class="s2">], </span><span class="s0">top_10_la</span><span class="s2">[</span><span class="s3">'predicted_hit_score'</span><span class="s2">], </span><span class="s0">color</span><span class="s2">=</span><span class="s0">plt</span><span class="s2">.</span><span class="s0">cm</span><span class="s2">.</span><span class="s0">plasma</span><span class="s2">(</span><span class="s0">np</span><span class="s2">.</span><span class="s0">linspace</span><span class="s2">(</span><span class="s5">0</span><span class="s2">, </span><span class="s5">1</span><span class="s2">, </span><span class="s0">len</span><span class="s2">(</span><span class="s0">top_10_la</span><span class="s2">))))</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">xlabel</span><span class="s2">(</span><span class="s3">'Predicted Hit Score (Linear Algebra)'</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">title</span><span class="s2">(</span><span class="s3">'Top 10 Songs Predicted by Linear Algebra'</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">gca</span><span class="s2">().</span><span class="s0">invert_yaxis</span><span class="s2">()  </span><span class="s4"># highest on top</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">show</span><span class="s2">()</span><hr class="ls0"><span class="s0">#%% 
+</span>
+<span class="s4"># Creating the top ten Linear regression and linear algebra side by side</span>
+<span class="s0">fig</span><span class="s2">, </span><span class="s0">axes </span><span class="s2">= </span><span class="s0">plt</span><span class="s2">.</span><span class="s0">subplots</span><span class="s2">(</span><span class="s5">1</span><span class="s2">, </span><span class="s5">2</span><span class="s2">, </span><span class="s0">figsize</span><span class="s2">=(</span><span class="s5">16</span><span class="s2">, </span><span class="s5">6</span><span class="s2">), </span><span class="s0">sharey</span><span class="s2">=</span><span class="s1">True</span><span class="s2">)</span>
+
+<span class="s4"># --- Linear Regression ---</span>
+<span class="s0">axes</span><span class="s2">[</span><span class="s5">0</span><span class="s2">].</span><span class="s0">barh</span><span class="s2">(</span><span class="s0">top_10_lr</span><span class="s2">[</span><span class="s3">'track_name'</span><span class="s2">], </span><span class="s0">top_10_lr</span><span class="s2">[</span><span class="s3">'predicted_hit_score_lr'</span><span class="s2">], </span><span class="s0">color</span><span class="s2">=</span><span class="s0">plt</span><span class="s2">.</span><span class="s0">cm</span><span class="s2">.</span><span class="s0">cool</span><span class="s2">(</span><span class="s0">np</span><span class="s2">.</span><span class="s0">linspace</span><span class="s2">(</span><span class="s5">0</span><span class="s2">, </span><span class="s5">1</span><span class="s2">, </span><span class="s0">len</span><span class="s2">(</span><span class="s0">top_10_lr</span><span class="s2">))))</span>
+<span class="s0">axes</span><span class="s2">[</span><span class="s5">0</span><span class="s2">].</span><span class="s0">set_xlabel</span><span class="s2">(</span><span class="s3">'Predicted Hit Score (Linear Regression)'</span><span class="s2">)</span>
+<span class="s0">axes</span><span class="s2">[</span><span class="s5">0</span><span class="s2">].</span><span class="s0">set_title</span><span class="s2">(</span><span class="s3">'Top 10 Songs — Linear Regression'</span><span class="s2">)</span>
+<span class="s0">axes</span><span class="s2">[</span><span class="s5">0</span><span class="s2">].</span><span class="s0">invert_yaxis</span><span class="s2">()  </span><span class="s4"># Highest on top</span>
+
+<span class="s4"># --- Linear Algebra ---</span>
+<span class="s0">axes</span><span class="s2">[</span><span class="s5">1</span><span class="s2">].</span><span class="s0">barh</span><span class="s2">(</span><span class="s0">top_10_la</span><span class="s2">[</span><span class="s3">'track_name'</span><span class="s2">], </span><span class="s0">top_10_la</span><span class="s2">[</span><span class="s3">'predicted_hit_score'</span><span class="s2">], </span><span class="s0">color</span><span class="s2">=</span><span class="s0">plt</span><span class="s2">.</span><span class="s0">cm</span><span class="s2">.</span><span class="s0">plasma</span><span class="s2">(</span><span class="s0">np</span><span class="s2">.</span><span class="s0">linspace</span><span class="s2">(</span><span class="s5">0</span><span class="s2">, </span><span class="s5">1</span><span class="s2">, </span><span class="s0">len</span><span class="s2">(</span><span class="s0">top_10_la</span><span class="s2">))))</span>
+<span class="s0">axes</span><span class="s2">[</span><span class="s5">1</span><span class="s2">].</span><span class="s0">set_xlabel</span><span class="s2">(</span><span class="s3">'Predicted Hit Score (Linear Algebra)'</span><span class="s2">)</span>
+<span class="s0">axes</span><span class="s2">[</span><span class="s5">1</span><span class="s2">].</span><span class="s0">set_title</span><span class="s2">(</span><span class="s3">'Top 10 Songs — Linear Algebra'</span><span class="s2">)</span>
+<span class="s0">axes</span><span class="s2">[</span><span class="s5">1</span><span class="s2">].</span><span class="s0">invert_yaxis</span><span class="s2">()</span>
+
+<span class="s4"># Improve layout</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">tight_layout</span><span class="s2">()</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">show</span><span class="s2">()</span>
+<hr class="ls0"><span class="s0">#%% md 
+# Merge top 10 Linear Algebra and Linear Equation 
+ <hr class="ls0">#%% 
+</span><span class="s4"># Merge on track_name to see differences</span>
+<span class="s0">comparison_top10 </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">merge</span><span class="s2">(</span>
+    <span class="s0">top_10_lr</span><span class="s2">[[</span><span class="s3">'track_name'</span><span class="s2">, </span><span class="s3">'predicted_hit_score_lr'</span><span class="s2">]],</span>
+    <span class="s0">top_10_la</span><span class="s2">[[</span><span class="s3">'track_name'</span><span class="s2">, </span><span class="s3">'predicted_hit_score'</span><span class="s2">]],</span>
+    <span class="s0">on</span><span class="s2">=</span><span class="s3">'track_name'</span><span class="s2">,</span>
+    <span class="s0">how</span><span class="s2">=</span><span class="s3">'outer'</span>
+<span class="s2">)</span>
+
+<span class="s4"># Fill missing values with 0 (if some songs are only in one list)</span>
+<span class="s0">comparison_top10 </span><span class="s2">= </span><span class="s0">comparison_top10</span><span class="s2">.</span><span class="s0">fillna</span><span class="s2">(</span><span class="s5">0</span><span class="s2">)</span>
+
+<span class="s4"># Add difference column</span>
+<span class="s0">comparison_top10</span><span class="s2">[</span><span class="s3">'score_diff'</span><span class="s2">] = </span><span class="s0">comparison_top10</span><span class="s2">[</span><span class="s3">'predicted_hit_score_lr'</span><span class="s2">] - </span><span class="s0">comparison_top10</span><span class="s2">[</span><span class="s3">'predicted_hit_score'</span><span class="s2">]</span>
+
+<span class="s4"># Sort by Linear Regression predicted score</span>
+<span class="s0">comparison_top10 </span><span class="s2">= </span><span class="s0">comparison_top10</span><span class="s2">.</span><span class="s0">sort_values</span><span class="s2">(</span><span class="s3">'predicted_hit_score_lr'</span><span class="s2">, </span><span class="s0">ascending</span><span class="s2">=</span><span class="s1">False</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">comparison_top10</span><span class="s2">)</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s4"># Coefficients from Linear Regression</span>
+<span class="s0">lr_importance </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">Series</span><span class="s2">(</span><span class="s0">lr_model</span><span class="s2">.</span><span class="s0">coef_</span><span class="s2">, </span><span class="s0">index</span><span class="s2">=</span><span class="s0">features</span><span class="s2">).</span><span class="s0">sort_values</span><span class="s2">(</span><span class="s0">ascending</span><span class="s2">=</span><span class="s1">False</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s3">&quot;Linear Regression Coefficients</span><span class="s1">\n</span><span class="s3">&quot;</span><span class="s2">, </span><span class="s0">lr_importance</span><span class="s2">)</span>
+
+
+<hr class="ls0"><span class="s0">#%% 
+</span><hr class="ls0"><span class="s0">#%% 
+</span><hr class="ls0"><span class="s0">#%% 
+</span><hr class="ls0"><span class="s0">#%% 
+</span><hr class="ls0"><span class="s0">#%% 
+</span></pre>
+</body>
+</html>
